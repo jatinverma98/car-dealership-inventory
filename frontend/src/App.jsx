@@ -10,6 +10,8 @@ import AddVehicle from './pages/admin/AddVehicle'
 import ManageVehicles from './pages/admin/ManageVehicles'
 import Restock from './pages/admin/Restock'
 import Purchases from './pages/admin/Purchases'
+import Users from './pages/admin/Users'
+import Profile from './pages/Profile'
 
 // protects routes that need login
 const ProtectedRoute = ({ children }) => {
@@ -78,9 +80,24 @@ const App = () => {
           </AdminRoute>
         } />
 
+        {/* profile route - any logged in user */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+
+          {/* admin only */}
+          <Route path="/admin/users" element={
+            <AdminRoute>
+              <Users />
+            </AdminRoute>
+          } />
+
         {/* fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+
     </div>
   )
 }

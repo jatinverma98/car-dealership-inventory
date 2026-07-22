@@ -28,23 +28,28 @@ const Navbar = () => {
           <Link to="/" className="text-gray-300 hover:text-primary transition-colors text-sm">
             Inventory
           </Link>
-          {user?.role === 'admin' && (
-            <Link to="/admin/dashboard" className="text-gray-300 hover:text-primary transition-colors text-sm">
-              Dashboard
-            </Link>
-          )}
+            {user?.role === 'admin' && (
+              <>
+                <Link to="/admin/dashboard" className="text-gray-300 hover:text-primary transition-colors text-sm">
+                  Dashboard
+                </Link>
+                <Link to="/admin/users" className="text-gray-300 hover:text-primary transition-colors text-sm">
+                  Users
+                </Link>
+              </>
+            )}
         </div>
 
         {/* user section */}
         <div className="flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
+              <Link to="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-semibold">
                   {user.name?.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-gray-300 text-sm hidden md:block">{user.name}</span>
-              </div>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="text-gray-400 hover:text-primary text-sm transition-colors"
@@ -53,6 +58,8 @@ const Navbar = () => {
               </button>
             </div>
           ) : (
+
+          
             <div className="flex items-center gap-4">
               <Link to="/login" className="text-gray-300 hover:text-primary text-sm transition-colors">
                 Login
