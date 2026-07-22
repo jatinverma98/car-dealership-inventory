@@ -34,6 +34,19 @@ const getVehicles = async (req, res) => {
   }
 };
 
+// GET /api/vehicles/:id
+const getVehicleById = async (req, res) => {
+  try {
+    const vehicle = await Vehicle.findById(req.params.id)
+    if (!vehicle) {
+      return res.status(404).json({ message: 'Vehicle not found' })
+    }
+    res.status(200).json(vehicle)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 // GET /api/vehicles/search
 const searchVehicles = async (req, res) => {
   try {
@@ -134,6 +147,7 @@ const restockVehicle = async (req, res) => {
 module.exports = {
   addVehicle,
   getVehicles,
+  getVehicleById,
   searchVehicles,
   updateVehicle,
   deleteVehicle,
