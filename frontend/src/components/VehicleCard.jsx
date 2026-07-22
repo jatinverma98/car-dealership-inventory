@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom'
 
 const VehicleCard = ({ vehicle }) => {
+  const imageUrl =
+    vehicle.images && vehicle.images.length > 0
+      ? `http://localhost:5000${vehicle.images[0]}`
+      : `https://source.unsplash.com/400x300/?${vehicle.make},car`
+
   return (
     <div className="bg-cardgray rounded-lg overflow-hidden hover:border border-primary transition-all duration-300 group">
 
-      {/* car image */}
       <div className="relative overflow-hidden h-48">
         <img
-          src={`https://source.unsplash.com/400x300/?${vehicle.make},car`}
+          src={imageUrl}
           alt={`${vehicle.make} ${vehicle.model}`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
@@ -20,7 +24,6 @@ const VehicleCard = ({ vehicle }) => {
         )}
       </div>
 
-      {/* card content */}
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
           <div>

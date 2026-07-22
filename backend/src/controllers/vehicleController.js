@@ -9,6 +9,10 @@ const addVehicle = async (req, res) => {
       return res.status(400).json({ message: 'Please fill required fields' });
     }
 
+    const images = req.files
+      ? req.files.map((f) => `/uploads/${f.filename}`)
+      : [];
+
     const vehicle = await Vehicle.create({
       make,
       model,
@@ -16,6 +20,7 @@ const addVehicle = async (req, res) => {
       price,
       quantity: quantity || 0,
       description,
+      images,
     });
 
     res.status(201).json(vehicle);
@@ -37,15 +42,15 @@ const getVehicles = async (req, res) => {
 // GET /api/vehicles/:id
 const getVehicleById = async (req, res) => {
   try {
-    const vehicle = await Vehicle.findById(req.params.id)
+    const vehicle = await Vehicle.findById(req.params.id);
     if (!vehicle) {
-      return res.status(404).json({ message: 'Vehicle not found' })
+      return res.status(404).json({ message: 'Vehicle not found' });
     }
-    res.status(200).json(vehicle)
+    res.status(200).json(vehicle);
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    res.status(500).json({ message: error.message });
   }
-}
+};
 
 // GET /api/vehicles/search
 const searchVehicles = async (req, res) => {
@@ -73,10 +78,17 @@ const searchVehicles = async (req, res) => {
 // PUT /api/vehicles/:id
 const updateVehicle = async (req, res) => {
   try {
-    const vehicle = await Vehicle.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updateData = { ...req.body };
+
+    if (req.files && req.files.length > 0) {
+      updateData.images = req.files.map((f) => `/uploads/${f.filename}`);
+    }
+
+    const vehicle = await Vehicle.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
 
     if (!vehicle) {
       return res.status(404).json({ message: 'Vehicle not found' });

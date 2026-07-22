@@ -7,6 +7,7 @@ const AddVehicle = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [images, setImages] = useState([])
 
   const [form, setForm] = useState({
     make: '',
@@ -30,13 +31,25 @@ const AddVehicle = () => {
     setLoading(true)
 
     try {
-      await axios.post('/vehicles', {
-        ...form,
-        price: Number(form.price),
-        quantity: Number(form.quantity),
+      const formData = new FormData()
+      formData.append('make', form.make)
+      formData.append('model', form.model)
+      formData.append('category', form.category)
+      formData.append('price', form.price)
+      formData.append('quantity', form.quantity)
+      formData.append('description', form.description)
+      images.forEach((img) => formData.append('images', img))
+
+      await axios.post('/vehicles', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       })
+
       setSuccess('Vehicle added successfully!')
-      setForm({ make: '', model: '', category: '', price: '', quantity: '', description: '' })
+      setForm({
+        make: '', model: '', category: '',
+        price: '', quantity: '', description: '',
+      })
+      setImages([])
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add vehicle')
     } finally {
@@ -147,7 +160,9 @@ const AddVehicle = () => {
             </div>
 
             <div>
-              <label className="text-gray-400 text-xs mb-1 block">Quantity in Stock</label>
+              <label className="text-gray-400 text-xs mb-1 block">
+                Quantity in Stock
+              </label>
               <input
                 type="number"
                 name="quantity"
@@ -169,6 +184,24 @@ const AddVehicle = () => {
                 rows={3}
                 className="w-full bg-dark border border-gray-700 text-white px-4 py-2.5 rounded text-sm focus:outline-none focus:border-primary transition-colors placeholder-gray-600 resize-none"
               />
+            </div>
+
+            <div>
+              <label className="text-gray-400 text-xs mb-1 block">
+                Vehicle Images (up to 5)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => setImages(Array.from(e.target.files))}
+                className="w-full bg-dark border border-gray-700 text-gray-300 px-4 py-2.5 rounded text-sm focus:outline-none focus:border-primary transition-colors file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary file:text-white file:text-xs cursor-pointer"
+              />
+              {images.length > 0 && (
+                <p className="text-gray-500 text-xs mt-1">
+                  {images.length} image(s) selected
+                </p>
+              )}
             </div>
 
             <div className="flex gap-3 pt-2">
