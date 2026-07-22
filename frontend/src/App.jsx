@@ -9,6 +9,7 @@ import Dashboard from './pages/admin/Dashboard'
 import AddVehicle from './pages/admin/AddVehicle'
 import ManageVehicles from './pages/admin/ManageVehicles'
 import Restock from './pages/admin/Restock'
+import Purchases from './pages/admin/Purchases'
 
 // protects routes that need login
 const ProtectedRoute = ({ children }) => {
@@ -69,6 +70,11 @@ const App = () => {
         <Route path="/admin/restock" element={
           <AdminRoute>
             <Restock />
+          </AdminRoute>
+        } />
+        <Route path="/admin/purchases" element={
+          <AdminRoute>
+            <Purchases />
           </AdminRoute>
         } />
 

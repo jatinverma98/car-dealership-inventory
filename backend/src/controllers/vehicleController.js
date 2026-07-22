@@ -1,4 +1,5 @@
 const Vehicle = require('../models/Vehicle');
+const Purchase = require('../models/Purchase');
 
 // POST /api/vehicles
 const addVehicle = async (req, res) => {
@@ -130,6 +131,15 @@ const purchaseVehicle = async (req, res) => {
 
     vehicle.quantity -= 1;
     await vehicle.save();
+
+    // save purchase record
+    await Purchase.create({
+      vehicle: vehicle._id,
+      user: req.user.id,
+      make: vehicle.make,
+      model: vehicle.model,
+      price: vehicle.price,
+    });
 
     res.status(200).json(vehicle);
   } catch (error) {
