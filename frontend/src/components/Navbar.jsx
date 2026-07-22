@@ -14,59 +14,106 @@ const Navbar = () => {
     <nav className="bg-darkgray border-b border-gray-800 px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
 
-        {/* logo */}
+        {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <span className="text-primary font-bold text-xl">Auto</span>
           <span className="text-white font-bold text-xl">Deal Hub</span>
         </Link>
 
-        {/* nav links */}
+        {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
-          <Link to="/" className="text-gray-300 hover:text-primary transition-colors text-sm">
+
+          <Link
+            to="/"
+            className="text-gray-300 hover:text-primary transition-colors text-sm"
+          >
             Home
           </Link>
-          <Link to="/" className="text-gray-300 hover:text-primary transition-colors text-sm">
+
+          <Link
+            to="/"
+            className="text-gray-300 hover:text-primary transition-colors text-sm"
+          >
             Inventory
           </Link>
-            {user?.role === 'admin' && (
-              <>
-                <Link to="/admin/dashboard" className="text-gray-300 hover:text-primary transition-colors text-sm">
-                  Dashboard
-                </Link>
-                <Link to="/admin/users" className="text-gray-300 hover:text-primary transition-colors text-sm">
-                  Users
-                </Link>
-              </>
-            )}
+
+          <Link
+            to="/about"
+            className="text-gray-300 hover:text-primary transition-colors text-sm"
+          >
+            About
+          </Link>
+
+          <Link
+            to="/contact"
+            className="text-gray-300 hover:text-primary transition-colors text-sm"
+          >
+            Contact
+          </Link>
+
+          {user?.role === 'admin' && (
+            <>
+              <Link
+                to="/admin/dashboard"
+                className="text-gray-300 hover:text-primary transition-colors text-sm"
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                to="/admin/users"
+                className="text-gray-300 hover:text-primary transition-colors text-sm"
+              >
+                Users
+              </Link>
+            </>
+          )}
+
         </div>
 
-        {/* user section */}
+        {/* User Section */}
         <div className="flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-4">
-              <Link to="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-semibold">
                   {user.name?.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-gray-300 text-sm hidden md:block">{user.name}</span>
+
+                <span className="text-gray-300 text-sm hidden md:block">
+                  {user.name}
+                </span>
               </Link>
+
               <button
                 onClick={handleLogout}
                 className="text-gray-400 hover:text-primary text-sm transition-colors"
               >
                 Logout
               </button>
+
             </div>
           ) : (
-
-          
             <div className="flex items-center gap-4">
-              <Link to="/login" className="text-gray-300 hover:text-primary text-sm transition-colors">
+
+              <Link
+                to="/login"
+                className="text-gray-300 hover:text-primary text-sm transition-colors"
+              >
                 Login
               </Link>
-              <Link to="/register" className="bg-primary text-white px-4 py-2 rounded text-sm hover:bg-red-700 transition-colors">
+
+              <Link
+                to="/register"
+                className="bg-primary text-white px-4 py-2 rounded text-sm hover:bg-red-700 transition-colors"
+              >
                 Register
               </Link>
+
             </div>
           )}
         </div>

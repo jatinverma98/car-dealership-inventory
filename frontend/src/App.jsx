@@ -12,6 +12,8 @@ import Restock from './pages/admin/Restock'
 import Purchases from './pages/admin/Purchases'
 import Users from './pages/admin/Users'
 import Profile from './pages/Profile'
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 
 // protects routes that need login
 const ProtectedRoute = ({ children }) => {
@@ -40,6 +42,8 @@ const App = () => {
         {/* public routes */}
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
         <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
 
         {/* protected routes */}
         <Route path="/" element={
