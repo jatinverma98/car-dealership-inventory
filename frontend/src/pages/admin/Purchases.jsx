@@ -1,25 +1,31 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from '../../api/axios'
+import { getImageUrl } from '../../utils/imageHelper'
 
 const Purchases = () => {
   const [purchases, setPurchases] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const fetchPurchases = async () => {
-    try {
-      const res = await axios.get('/purchases')
-      setPurchases(res.data)
-    } catch (err) {
-      setError('Failed to load purchases')
-    } finally {
-      setLoading(false)
-    }
-  }
+
 
   useEffect(() => {
-    fetchPurchases()
+    let isMounted = true
+    const loadPurchases = async () => {
+      try {
+        const res = await axios.get('/purchases')
+        if (isMounted) setPurchases(res.data)
+      } catch {
+        if (isMounted) setError('Failed to load purchases')
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    loadPurchases()
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (
@@ -50,8 +56,8 @@ const Purchases = () => {
       </div>
 
       {/* main content */}
-      <div className="flex-1 px-8 py-6">
-        <h1 className="text-white text-2xl font-bold mb-8">All Purchases</h1>
+      <div className="flex-1 px-8 py-6 font-sans">
+        <h1 className="text-white font-heading font-light text-3xl tracking-tight mb-8">All Purchases</h1>
 
         {error && (
           <div className="bg-red-900/30 border border-red-500 text-red-400 px-4 py-3 rounded mb-6 text-sm">
@@ -84,10 +90,7 @@ const Purchases = () => {
                   </tr>
                 ) : (
                   purchases.map((purchase, index) => {
-                    const imageUrl =
-                      purchase.vehicle?.images?.length > 0
-                        ? `http://localhost:5000${purchase.vehicle.images[0]}`
-                        : `https://source.unsplash.com/60x60/?${purchase.make},car`
+                    const imageUrl = getImageUrl(purchase.vehicle || { make: purchase.make, model: purchase.model })
 
                     return (
                       <tr

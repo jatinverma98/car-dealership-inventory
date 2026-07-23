@@ -2,20 +2,20 @@ import { Link } from "react-router-dom";
 
 const Welcome = () => {
   return (
-    <section className="bg-[#111111] text-white">
+    <section className="bg-[#111111] text-white font-sans">
       <div className="max-w-7xl mx-auto px-6 py-20 lg:py-28 grid lg:grid-cols-2 gap-12 items-center">
 
         <div>
-          <p className="text-primary font-semibold mb-3">
-            Auto Deal Hub
+          <p className="text-primary font-medium text-xs tracking-[0.25em] uppercase mb-3">
+            AUTO DEAL HUB
           </p>
 
-          <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+          <h1 className="text-5xl lg:text-6xl font-heading font-light leading-tight tracking-tight">
             Find Your
-            <span className="text-primary"> Perfect Car</span>
+            <span className="text-primary font-normal"> Perfect Car</span>
           </h1>
 
-          <p className="text-gray-400 mt-6 text-lg max-w-lg">
+          <p className="text-gray-300 font-normal mt-6 text-base sm:text-lg max-w-[650px] leading-relaxed">
             Browse quality vehicles from trusted brands.
             Compare prices, check details, and find the right car for you.
           </p>
@@ -24,14 +24,14 @@ const Welcome = () => {
 
             <Link
               to="/inventory"
-              className="bg-primary px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition"
+              className="bg-primary hover:bg-primary-hover text-white px-6 py-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300 shadow-md shadow-primary/10"
             >
               Browse Cars
             </Link>
 
             <Link
               to="/contact"
-              className="border border-gray-600 px-6 py-3 rounded-lg hover:border-primary hover:text-primary transition"
+              className="border border-gray-600 hover:border-primary hover:text-primary text-white px-6 py-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-300"
             >
               Contact
             </Link>
@@ -41,18 +41,18 @@ const Welcome = () => {
           <div className="flex gap-10 mt-10">
 
             <div>
-              <h2 className="text-3xl font-bold text-primary">500+</h2>
-              <p className="text-gray-400 text-sm">Cars</p>
+              <h2 className="text-3xl font-heading font-light text-primary tracking-tight">500+</h2>
+              <p className="text-gray-400 text-xs font-medium uppercase tracking-wider mt-1">Cars</p>
             </div>
 
             <div>
-              <h2 className="text-3xl font-bold text-primary">50+</h2>
-              <p className="text-gray-400 text-sm">Brands</p>
+              <h2 className="text-3xl font-heading font-light text-primary tracking-tight">50+</h2>
+              <p className="text-gray-400 text-xs font-medium uppercase tracking-wider mt-1">Brands</p>
             </div>
 
             <div>
-              <h2 className="text-3xl font-bold text-primary">1000+</h2>
-              <p className="text-gray-400 text-sm">Customers</p>
+              <h2 className="text-3xl font-heading font-light text-primary tracking-tight">1000+</h2>
+              <p className="text-gray-400 text-xs font-medium uppercase tracking-wider mt-1">Customers</p>
             </div>
 
           </div>

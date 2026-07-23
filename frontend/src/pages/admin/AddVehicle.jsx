@@ -84,18 +84,18 @@ const AddVehicle = () => {
       </div>
 
       {/* main content */}
-      <div className="flex-1 px-8 py-6">
-        <h1 className="text-white text-2xl font-bold mb-8">Add New Vehicle</h1>
+      <div className="flex-1 px-8 py-6 font-sans">
+        <h1 className="text-white font-heading font-light text-3xl tracking-tight mb-8">Add New Vehicle</h1>
 
-        <div className="bg-darkgray rounded-xl p-8 max-w-2xl">
+        <div className="bg-darkgray border border-gray-800/80 rounded-2xl p-8 max-w-2xl">
 
           {error && (
-            <div className="bg-red-900/30 border border-red-500 text-red-400 px-4 py-3 rounded mb-6 text-sm">
+            <div className="bg-red-900/30 border border-red-500 text-red-400 px-4 py-3.5 rounded-xl mb-6 text-sm font-medium">
               {error}
             </div>
           )}
           {success && (
-            <div className="bg-green-900/30 border border-green-700 text-green-400 px-4 py-3 rounded mb-6 text-sm">
+            <div className="bg-green-900/30 border border-green-700 text-green-400 px-4 py-3.5 rounded-xl mb-6 text-sm font-medium">
               {success}
             </div>
           )}
@@ -208,14 +208,14 @@ const AddVehicle = () => {
               <button
                 type="button"
                 onClick={() => navigate('/admin/dashboard')}
-                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 rounded font-semibold transition-colors text-sm"
+                className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-primary hover:bg-red-700 text-white py-3 rounded font-semibold transition-colors text-sm disabled:opacity-50"
+                className="flex-1 bg-primary hover:bg-primary-hover text-white py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider transition-colors disabled:opacity-50 shadow-md shadow-primary/10"
               >
                 {loading ? 'Adding...' : 'Add Vehicle'}
               </button>

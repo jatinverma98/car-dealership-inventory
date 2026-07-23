@@ -7,13 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#e63946',
-        dark: '#0a0a0a',
+        primary: '#b91c1c',
+        'primary-hover': '#dc2626',
+        dark: '#111111',
         darkgray: '#1a1a1a',
         cardgray: '#222222',
       },
       fontFamily: {
+        heading: ['Sora', 'Outfit', 'sans-serif'],
         sans: ['Inter', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+        space: ['Sora', 'Outfit', 'sans-serif'],
       },
     },
   },

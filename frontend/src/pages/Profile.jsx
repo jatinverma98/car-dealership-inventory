@@ -19,25 +19,6 @@ const Profile = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const fetchProfile = async () => {
-    try {
-      const [profileRes, purchasesRes] = await Promise.all([
-        axios.get('/users/profile'),
-        axios.get('/purchases/my'),
-      ])
-      setForm((prev) => ({
-        ...prev,
-        name: profileRes.data.name,
-        email: profileRes.data.email,
-      }))
-      setPurchases(purchasesRes.data)
-    } catch (err) {
-      setError('Failed to load profile')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleUpdate = async (e) => {
     e.preventDefault()
     setError('')
@@ -72,7 +53,31 @@ const Profile = () => {
   }
 
   useEffect(() => {
-    fetchProfile()
+    let isMounted = true
+    const loadProfileData = async () => {
+      try {
+        const [profileRes, purchasesRes] = await Promise.all([
+          axios.get('/users/profile'),
+          axios.get('/purchases/my'),
+        ])
+        if (isMounted) {
+          setForm((prev) => ({
+            ...prev,
+            name: profileRes.data.name,
+            email: profileRes.data.email,
+          }))
+          setPurchases(purchasesRes.data)
+        }
+      } catch {
+        if (isMounted) setError('Failed to load profile')
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    loadProfileData()
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   if (loading) return (
@@ -82,21 +87,21 @@ const Profile = () => {
   )
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8">
-      <h1 className="text-white text-2xl font-bold mb-8">My Profile</h1>
+    <div className="max-w-5xl mx-auto px-6 py-8 font-sans">
+      <h1 className="text-white font-heading font-light text-3xl sm:text-4xl tracking-tight mb-8">My Profile</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* left - profile card */}
         <div className="lg:col-span-1">
-          <div className="bg-darkgray rounded-xl p-6 text-center">
+          <div className="bg-darkgray rounded-2xl border border-gray-800/80 p-6 text-center">
 
             {/* avatar */}
-            <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
+            <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-white text-3xl font-heading font-light mx-auto mb-4">
               {user?.name?.charAt(0).toUpperCase()}
             </div>
 
-            <h2 className="text-white font-semibold text-lg">{user?.name}</h2>
+            <h2 className="text-white font-heading font-semibold text-lg">{user?.name}</h2>
             <p className="text-gray-400 text-sm mt-1">{user?.email}</p>
 
             <span className={`inline-block mt-3 text-xs px-3 py-1 rounded-full font-medium ${
@@ -114,11 +119,11 @@ const Profile = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Member Since</span>
-                <span className="text-white text-xs">
-                  {new Date(user?.createdAt || Date.now()).toLocaleDateString('en-IN', {
+                <span className="text-[#ef4444] font-semibold text-xs">
+                  {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN', {
                     month: 'short',
                     year: 'numeric',
-                  })}
+                  }) : 'N/A'}
                 </span>
               </div>
             </div>

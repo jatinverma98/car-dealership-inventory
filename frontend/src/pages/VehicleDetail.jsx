@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from '../api/axios'
+import { getImageUrl } from '../utils/imageHelper'
 
 const VehicleDetail = () => {
   const { id } = useParams()
@@ -13,16 +14,7 @@ const VehicleDetail = () => {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
-  const fetchVehicle = async () => {
-    try {
-      const res = await axios.get(`/vehicles/${id}`)
-      setVehicle(res.data)
-    } catch (err) {
-      setError('Vehicle not found')
-    } finally {
-      setLoading(false)
-    }
-  }
+
 
   const handlePurchase = async () => {
     try {
@@ -40,7 +32,21 @@ const VehicleDetail = () => {
   }
 
   useEffect(() => {
-    fetchVehicle()
+    let isMounted = true
+    const loadVehicle = async () => {
+      try {
+        const res = await axios.get(`/vehicles/${id}`)
+        if (isMounted) setVehicle(res.data)
+      } catch {
+        if (isMounted) setError('Vehicle not found')
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    loadVehicle()
+    return () => {
+      isMounted = false
+    }
   }, [id])
 
   if (loading) return (
@@ -61,9 +67,10 @@ const VehicleDetail = () => {
     </div>
   )
 
+  const mainImage = getImageUrl(vehicle)
   const images = vehicle.images && vehicle.images.length > 0
-    ? vehicle.images.map((img) => `http://localhost:5000${img}`)
-    : [`https://source.unsplash.com/800x600/?${vehicle.make},car`]
+    ? vehicle.images.map((img) => typeof img === 'string' && (img.startsWith('http://') || img.startsWith('https://')) ? img : `http://localhost:5000${img}`)
+    : [mainImage]
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -122,10 +129,10 @@ const VehicleDetail = () => {
         </div>
 
         {/* right - details */}
-        <div className="bg-darkgray rounded-xl p-6">
+        <div className="bg-darkgray rounded-2xl border border-gray-800/80 p-7 font-sans">
 
           <div className="flex items-start justify-between mb-6">
-            <h1 className="text-white text-2xl font-bold">
+            <h1 className="text-white font-heading font-normal text-3xl tracking-tight">
               {vehicle.make} {vehicle.model}
             </h1>
             <span className={`text-xs px-3 py-1 rounded-full font-medium ${
@@ -146,9 +153,9 @@ const VehicleDetail = () => {
               { label: 'Stock Available', value: vehicle.quantity },
             ].map(({ label, value }) => (
               <div key={label} className="flex items-center border-b border-gray-800 pb-3">
-                <span className="text-gray-400 text-sm w-40">{label}</span>
-                <span className={`text-sm font-medium ${
-                  label === 'Price' ? 'text-primary' : 'text-white'
+                <span className="text-gray-400 text-sm w-40 font-medium">{label}</span>
+                <span className={`text-sm ${
+                  label === 'Price' ? 'text-primary font-heading font-bold text-xl' : 'text-white font-medium'
                 }`}>
                   {value}
                 </span>
@@ -158,22 +165,22 @@ const VehicleDetail = () => {
 
           {vehicle.description && (
             <div className="mb-6">
-              <p className="text-gray-400 text-xs uppercase tracking-wider mb-2">
+              <p className="text-primary text-xs uppercase tracking-[0.25em] font-medium mb-2">
                 Description
               </p>
-              <p className="text-gray-300 text-sm leading-relaxed">
+              <p className="text-gray-300 font-normal text-sm leading-relaxed max-w-[650px]">
                 {vehicle.description}
               </p>
             </div>
           )}
 
           {message && (
-            <div className="bg-green-900/30 border border-green-700 text-green-400 px-4 py-3 rounded mb-4 text-sm">
+            <div className="bg-green-900/30 border border-green-700 text-green-400 px-4 py-3 rounded-xl mb-4 text-sm font-medium">
               {message}
             </div>
           )}
           {error && (
-            <div className="bg-red-900/30 border border-red-500 text-red-400 px-4 py-3 rounded mb-4 text-sm">
+            <div className="bg-red-900/30 border border-red-500 text-red-400 px-4 py-3 rounded-xl mb-4 text-sm font-medium">
               {error}
             </div>
           )}
@@ -182,7 +189,7 @@ const VehicleDetail = () => {
             <button
               onClick={handlePurchase}
               disabled={vehicle.quantity === 0 || purchasing}
-              className="flex-1 bg-primary hover:bg-red-700 text-white py-3 rounded font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-1 bg-primary hover:bg-primary-hover text-white py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-primary/10"
             >
               {purchasing
                 ? 'Processing...'
@@ -192,7 +199,7 @@ const VehicleDetail = () => {
             </button>
             <button
               onClick={() => navigate('/')}
-              className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 rounded font-semibold transition-colors"
+              className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider transition-colors"
             >
               Go Back
             </button>

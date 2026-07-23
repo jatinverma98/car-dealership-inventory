@@ -33,7 +33,27 @@ const addVehicle = async (req, res) => {
 // GET /api/vehicles
 const getVehicles = async (req, res) => {
   try {
-    const vehicles = await Vehicle.find();
+    let vehicles = await Vehicle.find();
+    if (!vehicles || vehicles.length === 0) {
+      const initialVehicles = [
+        { make: 'Chevrolet', model: 'Corvette Stingray Z06', category: 'Coupe', price: 19999000, quantity: 3, fuelType: 'Petrol', transmission: 'Automatic', mileage: '12,000 km', description: 'High-performance V8 sports coupe.', images: [] },
+        { make: 'Mercedes-Benz', model: 'GLE Coupe 43 AMG', category: 'SUV', price: 11500000, quantity: 4, fuelType: 'Petrol', transmission: 'Automatic', mileage: '18,500 km', description: 'Luxury coupe SUV.', images: [] },
+        { make: 'Porsche', model: 'Taycan Turbo S', category: 'Sedan', price: 22500000, quantity: 2, fuelType: 'Electric', transmission: 'Automatic', mileage: '8,200 km', description: 'All-electric flagship supercar.', images: [] },
+        { make: 'BMW', model: 'M4 Competition xDrive', category: 'Coupe', price: 15300000, quantity: 5, fuelType: 'Petrol', transmission: 'Automatic', mileage: '10,000 km', description: 'Twin-turbo inline-6 sports coupe.', images: [] },
+        { make: 'Audi', model: 'Q7 Quattro RS', category: 'SUV', price: 9450000, quantity: 6, fuelType: 'Diesel', transmission: 'Automatic', mileage: '24,000 km', description: '7-seater luxury SUV.', images: [] },
+        { make: 'Ford', model: 'Mustang GT V8', category: 'Coupe', price: 8900000, quantity: 3, fuelType: 'Petrol', transmission: 'Automatic', mileage: '15,000 km', description: 'Iconic American muscle car.', images: [] },
+        { make: 'Land Rover', model: 'Range Rover Velar', category: 'SUV', price: 8990000, quantity: 4, fuelType: 'Diesel', transmission: 'Automatic', mileage: '21,000 km', description: 'Sleek luxury SUV.', images: [] },
+        { make: 'Toyota', model: 'Fortuner Legender 4x4', category: 'SUV', price: 4650000, quantity: 8, fuelType: 'Diesel', transmission: 'Automatic', mileage: '28,000 km', description: 'Robust 7-seater SUV.', images: [] },
+        { make: 'Mahindra', model: 'Thar LX 4x4 Hardtop', category: 'SUV', price: 1825000, quantity: 10, fuelType: 'Diesel', transmission: 'Manual', mileage: '19,000 km', description: 'Iconic off-roader.', images: [] },
+        { make: 'Hyundai', model: 'Creta SX (O) Turbo', category: 'SUV', price: 1980000, quantity: 12, fuelType: 'Petrol', transmission: 'Automatic', mileage: '14,000 km', description: 'Feature-loaded compact SUV.', images: [] },
+        { make: 'Honda', model: 'City ZX i-VTEC', category: 'Sedan', price: 1695000, quantity: 7, fuelType: 'Petrol', transmission: 'Automatic', mileage: '22,000 km', description: 'Executive sedan.', images: [] },
+        { make: 'Lamborghini', model: 'Huracán EVO Spyder', category: 'Coupe', price: 37500000, quantity: 1, fuelType: 'Petrol', transmission: 'Automatic', mileage: '4,500 km', description: 'V10 mid-engine convertible supercar.', images: [] },
+        { make: 'Jaguar', model: 'F-Type R-Dynamic', category: 'Coupe', price: 14500000, quantity: 2, fuelType: 'Petrol', transmission: 'Automatic', mileage: '9,800 km', description: 'British sports car.', images: [] },
+        { make: 'Tesla', model: 'Model S Plaid', category: 'Electric', price: 17500000, quantity: 3, fuelType: 'Electric', transmission: 'Automatic', mileage: '6,000 km', description: 'Tri-motor electric sedan.', images: [] }
+      ];
+      await Vehicle.insertMany(initialVehicles);
+      vehicles = await Vehicle.find();
+    }
     res.status(200).json(vehicles);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -10,16 +10,7 @@ const Users = () => {
   const [success, setSuccess] = useState('')
   const { user: currentUser } = useAuth()
 
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get('/users')
-      setUsers(res.data)
-    } catch (err) {
-      setError('Failed to load users')
-    } finally {
-      setLoading(false)
-    }
-  }
+
 
   const handleDeleteUser = async (id) => {
     if (id === currentUser._id) {
@@ -30,7 +21,7 @@ const Users = () => {
       await axios.delete(`/users/${id}`)
       setUsers(users.filter((u) => u._id !== id))
       setSuccess('User deleted successfully')
-    } catch (err) {
+    } catch {
       setError('Failed to delete user')
     }
   }
@@ -43,13 +34,27 @@ const Users = () => {
       const res = await axios.put(`/users/${id}/role`, { role: newRole })
       setUsers(users.map((u) => (u._id === id ? res.data : u)))
       setSuccess('User role updated')
-    } catch (err) {
+    } catch {
       setError('Failed to update role')
     }
   }
 
   useEffect(() => {
-    fetchUsers()
+    let isMounted = true
+    const loadUsersData = async () => {
+      try {
+        const res = await axios.get('/users')
+        if (isMounted) setUsers(res.data)
+      } catch {
+        if (isMounted) setError('Failed to load users')
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    loadUsersData()
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (
@@ -81,10 +86,10 @@ const Users = () => {
       </div>
 
       {/* main content */}
-      <div className="flex-1 px-8 py-6">
+      <div className="flex-1 px-8 py-6 font-sans">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-white text-2xl font-bold">Manage Users</h1>
-          <span className="text-gray-400 text-sm">
+          <h1 className="text-white font-heading font-light text-3xl tracking-tight">Manage Users</h1>
+          <span className="text-gray-400 text-sm font-normal">
             Total: {users.length} users
           </span>
         </div>

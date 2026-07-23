@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import axios from '../../api/axios'
 
 const StatCard = ({ title, value, subtitle, color }) => (
-  <div className="bg-darkgray rounded-xl p-6">
-    <p className="text-gray-400 text-sm mb-2">{title}</p>
-    <p className={`text-4xl font-bold mb-1 ${color || 'text-white'}`}>{value}</p>
+  <div className="bg-darkgray border border-gray-800/80 rounded-2xl p-6 font-sans">
+    <p className="text-gray-400 text-[11px] uppercase tracking-wide font-medium mb-2">{title}</p>
+    <p className={`text-4xl font-heading font-light mb-1 ${color || 'text-white'}`}>{value}</p>
     <p className="text-gray-500 text-xs">{subtitle}</p>
   </div>
 )
@@ -21,33 +21,7 @@ const Dashboard = () => {
   const [dailyPurchases, setDailyPurchases] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const fetchDashboardData = async () => {
-    try {
-      const [vehiclesRes, purchaseStatsRes, allPurchasesRes] = await Promise.all([
-        axios.get('/vehicles'),
-        axios.get('/purchases/stats'),
-        axios.get('/purchases'),
-      ])
 
-      const vehicles = vehiclesRes.data
-      const totalStock = vehicles.reduce((sum, v) => sum + v.quantity, 0)
-      const lowStock = vehicles.filter((v) => v.quantity <= 2).length
-
-      setStats({
-        totalVehicles: vehicles.length,
-        totalStock,
-        totalPurchases: purchaseStatsRes.data.totalPurchases,
-        lowStockAlerts: lowStock,
-      })
-
-      setDailyPurchases(purchaseStatsRes.data.dailyPurchases)
-      setRecentPurchases(allPurchasesRes.data.slice(0, 4))
-    } catch (err) {
-      console.log('Failed to fetch dashboard data', err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   // build last 7 days labels and match with data
   const getLast7Days = () => {
@@ -68,7 +42,40 @@ const Dashboard = () => {
   const maxCount = Math.max(...chartData.map((d) => d.count), 1)
 
   useEffect(() => {
-    fetchDashboardData()
+    let isMounted = true
+    const loadDashboard = async () => {
+      try {
+        const [vehiclesRes, purchaseStatsRes, allPurchasesRes] = await Promise.all([
+          axios.get('/vehicles'),
+          axios.get('/purchases/stats'),
+          axios.get('/purchases'),
+        ])
+
+        if (isMounted) {
+          const vehicles = vehiclesRes.data
+          const totalStock = vehicles.reduce((sum, v) => sum + v.quantity, 0)
+          const lowStock = vehicles.filter((v) => v.quantity <= 2).length
+
+          setStats({
+            totalVehicles: vehicles.length,
+            totalStock,
+            totalPurchases: purchaseStatsRes.data.totalPurchases,
+            lowStockAlerts: lowStock,
+          })
+
+          setDailyPurchases(purchaseStatsRes.data.dailyPurchases)
+          setRecentPurchases(allPurchasesRes.data.slice(0, 4))
+        }
+      } catch (err) {
+        console.log('Failed to fetch dashboard data', err.message)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    loadDashboard()
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   if (loading) return (
@@ -78,7 +85,7 @@ const Dashboard = () => {
   )
 
   return (
-    <div className="flex min-h-screen bg-dark">
+    <div className="flex min-h-screen bg-dark font-sans">
 
       {/* sidebar */}
       <div className="w-56 bg-darkgray border-r border-gray-800 px-4 py-6 flex flex-col gap-1">
@@ -93,9 +100,9 @@ const Dashboard = () => {
           <Link
             key={label}
             to={to}
-            className={`px-4 py-2.5 rounded text-sm font-medium transition-colors ${
+            className={`px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-colors ${
               active
-                ? 'bg-primary text-white'
+                ? 'bg-primary text-white shadow-md shadow-primary/10'
                 : 'text-gray-400 hover:text-white hover:bg-gray-800'
             }`}
           >
@@ -106,7 +113,7 @@ const Dashboard = () => {
 
       {/* main content */}
       <div className="flex-1 px-8 py-6">
-        <h1 className="text-white text-2xl font-bold mb-8">Dashboard</h1>
+        <h1 className="text-white font-heading font-light text-3xl tracking-tight mb-8">Dashboard</h1>
 
         {/* stat cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">

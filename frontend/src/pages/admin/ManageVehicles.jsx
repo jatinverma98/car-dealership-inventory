@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { LayoutGrid, Table } from 'lucide-react'
 import axios from '../../api/axios'
+import AdminVehicleCard from '../../components/AdminVehicleCard'
 
 const ManageVehicles = () => {
   const [vehicles, setVehicles] = useState([])
@@ -8,24 +10,16 @@ const ManageVehicles = () => {
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState({})
   const [error, setError] = useState('')
+  const [viewMode, setViewMode] = useState('grid') // 'grid' or 'table'
 
-  const fetchVehicles = async () => {
-    try {
-      const res = await axios.get('/vehicles')
-      setVehicles(res.data)
-    } catch (err) {
-      setError('Failed to load vehicles')
-    } finally {
-      setLoading(false)
-    }
-  }
+
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this vehicle?')) return
     try {
       await axios.delete(`/vehicles/${id}`)
       setVehicles(vehicles.filter((v) => v._id !== id))
-    } catch (err) {
+    } catch {
       setError('Failed to delete vehicle')
     }
   }
@@ -50,20 +44,38 @@ const ManageVehicles = () => {
       })
       setVehicles(vehicles.map((v) => (v._id === id ? res.data : v)))
       setEditingId(null)
-    } catch (err) {
+    } catch {
       setError('Failed to update vehicle')
     }
   }
 
+  const handleVehicleUpdated = (updatedVehicle) => {
+    setVehicles(vehicles.map((v) => (v._id === updatedVehicle._id ? updatedVehicle : v)))
+  }
+
   useEffect(() => {
-    fetchVehicles()
+    let isMounted = true
+    const loadVehiclesData = async () => {
+      try {
+        const res = await axios.get('/vehicles')
+        if (isMounted) setVehicles(res.data)
+      } catch {
+        if (isMounted) setError('Failed to load vehicles')
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    loadVehiclesData()
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (
-    <div className="flex min-h-screen bg-dark">
+    <div className="flex min-h-screen bg-dark font-sans text-white">
 
-      {/* sidebar */}
-      <div className="w-56 bg-darkgray border-r border-gray-800 px-4 py-6 flex flex-col gap-1">
+      {/* Sidebar */}
+      <div className="w-56 bg-darkgray border-r border-gray-800 px-4 py-6 flex flex-col gap-1 shrink-0">
         {[
           { label: 'Dashboard', to: '/admin/dashboard' },
           { label: 'Vehicles', to: '/admin/manage-vehicles', active: true },
@@ -85,16 +97,46 @@ const ManageVehicles = () => {
         ))}
       </div>
 
-      {/* main content */}
+      {/* Main Content */}
       <div className="flex-1 px-8 py-6">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-white text-2xl font-bold">Manage Vehicles</h1>
-          <Link
-            to="/admin/add-vehicle"
-            className="bg-primary hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-          >
-            Add Vehicle
-          </Link>
+        
+        {/* Header Actions */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-white font-heading font-light text-3xl tracking-tight">Manage Vehicles</h1>
+            <p className="text-gray-300 font-normal text-xs mt-1">Control vehicle inventory, adjust stock levels, or edit specifications.</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* View Mode Toggle Buttons */}
+            <div className="flex bg-darkgray p-1 rounded-xl border border-gray-800">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === 'grid' ? 'bg-primary text-white' : 'text-gray-400 hover:text-white'
+                }`}
+                title="Grid Cards View"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === 'table' ? 'bg-primary text-white' : 'text-gray-400 hover:text-white'
+                }`}
+                title="Table View"
+              >
+                <Table className="w-4 h-4" />
+              </button>
+            </div>
+
+            <Link
+              to="/admin/add-vehicle"
+              className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-colors shadow-md shadow-primary/20"
+            >
+              + Add Vehicle
+            </Link>
+          </div>
         </div>
 
         {error && (
@@ -107,17 +149,40 @@ const ManageVehicles = () => {
           <div className="text-center py-20">
             <div className="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
+        ) : viewMode === 'grid' ? (
+          
+          /* Admin Vehicle Cards Grid */
+          vehicles.length === 0 ? (
+            <div className="bg-darkgray rounded-xl p-12 text-center text-gray-500">
+              No vehicles found. Click "+ Add Vehicle" to create one.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {vehicles.map((v) => (
+                <AdminVehicleCard
+                  key={v._id}
+                  vehicle={v}
+                  onUpdate={handleVehicleUpdated}
+                  onDelete={handleDelete}
+                  onEdit={handleEditStart}
+                />
+              ))}
+            </div>
+          )
+
         ) : (
-          <div className="bg-darkgray rounded-xl overflow-hidden">
+
+          /* Table View */
+          <div className="bg-darkgray rounded-xl overflow-hidden border border-gray-800">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left text-gray-400 text-xs px-6 py-4">Make</th>
-                  <th className="text-left text-gray-400 text-xs px-6 py-4">Model</th>
-                  <th className="text-left text-gray-400 text-xs px-6 py-4">Category</th>
-                  <th className="text-left text-gray-400 text-xs px-6 py-4">Price (₹)</th>
-                  <th className="text-left text-gray-400 text-xs px-6 py-4">Stock</th>
-                  <th className="text-left text-gray-400 text-xs px-6 py-4">Actions</th>
+                <tr className="border-b border-gray-800 bg-black/30">
+                  <th className="text-left text-gray-400 text-xs px-6 py-4 font-space">Make</th>
+                  <th className="text-left text-gray-400 text-xs px-6 py-4 font-space">Model</th>
+                  <th className="text-left text-gray-400 text-xs px-6 py-4 font-space">Category</th>
+                  <th className="text-left text-gray-400 text-xs px-6 py-4 font-space">Price (₹)</th>
+                  <th className="text-left text-gray-400 text-xs px-6 py-4 font-space">Stock Level</th>
+                  <th className="text-left text-gray-400 text-xs px-6 py-4 font-space">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,7 +194,7 @@ const ManageVehicles = () => {
                   </tr>
                 ) : (
                   vehicles.map((v) => (
-                    <tr key={v._id} className="border-b border-gray-800 hover:bg-gray-800/20 transition-colors">
+                    <tr key={v._id} className="border-b border-gray-800/60 hover:bg-gray-800/20 transition-colors">
                       {editingId === v._id ? (
                         <>
                           <td className="px-4 py-3">
@@ -191,18 +256,18 @@ const ManageVehicles = () => {
                           <td className="text-white text-sm px-6 py-4">{v.make}</td>
                           <td className="text-white text-sm px-6 py-4">{v.model}</td>
                           <td className="text-gray-400 text-sm px-6 py-4">{v.category}</td>
-                          <td className="text-primary text-sm px-6 py-4">
-                            ₹{v.price.toLocaleString('en-IN')}
+                          <td className="text-primary text-sm px-6 py-4 font-bold">
+                            ₹{v.price?.toLocaleString('en-IN')}
                           </td>
                           <td className="px-6 py-4">
-                            <span className={`text-xs px-2 py-1 rounded-full ${
+                            <span className={`text-xs px-2.5 py-1 rounded-full font-bold font-space ${
                               v.quantity === 0
-                                ? 'bg-red-900/40 text-red-400'
+                                ? 'bg-red-900/40 text-red-400 border border-red-800/40'
                                 : v.quantity <= 2
-                                ? 'bg-yellow-900/40 text-yellow-400'
-                                : 'bg-green-900/40 text-green-400'
+                                ? 'bg-yellow-900/40 text-yellow-400 border border-yellow-800/40'
+                                : 'bg-green-900/40 text-green-400 border border-green-800/40'
                             }`}>
-                              {v.quantity}
+                              {v.quantity} units
                             </span>
                           </td>
                           <td className="px-6 py-4">
@@ -229,7 +294,9 @@ const ManageVehicles = () => {
               </tbody>
             </table>
           </div>
+
         )}
+
       </div>
     </div>
   )
